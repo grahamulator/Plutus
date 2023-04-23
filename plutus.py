@@ -13,6 +13,7 @@ import sys
 import time
 
 DATABASE = r'database/11_13_2022/'
+HASH_OUTPUT_INTERVAL = 5000
 
 def generate_private_key():
     return binascii.hexlify(os.urandom(32)).decode('utf-8').upper()
@@ -59,15 +60,22 @@ def private_key_to_wif(private_key):
         else: break
     return chars[0] * pad + result
 
-def main(database, args):
+def main(database, args, hash_num, start_time):
+    local_count = 0
     while True:
         private_key = generate_private_key()
         public_key = private_key_to_public_key(private_key, args['fastecdsa']) 
         address = public_key_to_address(public_key)
+        local_count += 1 
 
         if args['verbose']:
             print(address)
         
+        if local_count % HASH_OUTPUT_INTERVAL == 0:
+            hash_num.value += HASH_OUTPUT_INTERVAL
+            elapsed_time = time.time() - start_time.value
+            print(f"Total hashes: {hash_num.value}, Rate: {hash_num.value//elapsed_time} hash/s", end="\r")
+
         if address[-args['substring']:] in database:
             for filename in os.listdir(DATABASE):
                 with open(DATABASE + filename) as file:
@@ -160,6 +168,8 @@ if __name__ == '__main__':
 
     print('database size: ' + str(len(database)))
     print('processes spawned: ' + str(args['cpu_count']))
+    hash_num = multiprocessing.Value('i', 0)
+    start_time = multiprocessing.Value('d', time.time())
     
     for cpu in range(args['cpu_count']):
-        multiprocessing.Process(target = main, args = (database, args)).start()
+        multiprocessing.Process(target = main, args = (database, args, hash_num, start_time)).start()
