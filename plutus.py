@@ -11,7 +11,9 @@ import binascii
 import os
 import sys
 import time
+import locale
 
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 DATABASE = r'database/11_13_2022/'
 HASH_OUTPUT_INTERVAL = 5000
 
@@ -73,8 +75,9 @@ def main(database, args, hash_num, start_time):
         
         if local_count % HASH_OUTPUT_INTERVAL == 0:
             hash_num.value += HASH_OUTPUT_INTERVAL
-            elapsed_time = time.time() - start_time.value
-            print(f"Total hashes: {hash_num.value}, Rate: {hash_num.value//elapsed_time} hash/s", end="\r")
+            elapsed_time = time.time() - start_time
+            hours, minutes, seconds = int(elapsed_time)//3600, int(elapsed_time)//60%60, int(elapsed_time)%60
+            print(f"Total hashes: {hash_num.value:n}; Rate: {(hash_num.value//elapsed_time):n} hash/s; Run time: {hours:n}:{minutes:02d}:{seconds:02d}", end="\r")
 
         if address[-args['substring']:] in database:
             for filename in os.listdir(DATABASE):
@@ -169,7 +172,7 @@ if __name__ == '__main__':
     print('database size: ' + str(len(database)))
     print('processes spawned: ' + str(args['cpu_count']))
     hash_num = multiprocessing.Value('i', 0)
-    start_time = multiprocessing.Value('d', time.time())
+    start_time = time.time()
     
     for cpu in range(args['cpu_count']):
         multiprocessing.Process(target = main, args = (database, args, hash_num, start_time)).start()
