@@ -14,7 +14,7 @@ import time
 import locale
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
-GLOBAL_DB_PATH = r'/plutus/database/11-13-2022/'
+GLOBAL_DB_PATH = r'/plutus/database/11_13_2022/'
 DATABASE = GLOBAL_DB_PATH if os.path.exists(GLOBAL_DB_PATH) else r'database/11_13_2022/'
 HASH_OUTPUT_INTERVAL = 5000
 
@@ -156,6 +156,10 @@ if __name__ == '__main__':
             else:
                 print('invalid input. substring must be greater than 0 and less than 27')
                 sys.exit(-1)
+        elif command == 'db_path':
+            db_path = arg.split('=')[1]
+            if os.path.exists(db_path):
+                DATABASE = db_path
         else:
             print('invalid input: ' + command  + '\nrun `python3 plutus.py help` for help')
             sys.exit(-1)
