@@ -14,7 +14,8 @@ import time
 import locale
 
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
-DATABASE = r'database/11_13_2022/'
+GLOBAL_DB_PATH = r'/plutus/database/11-13-2022/'
+DATABASE = GLOBAL_DB_PATH if os.path.exists(GLOBAL_DB_PATH) else r'database/11_13_2022/'
 HASH_OUTPUT_INTERVAL = 5000
 
 def generate_private_key():
@@ -159,7 +160,7 @@ if __name__ == '__main__':
             print('invalid input: ' + command  + '\nrun `python3 plutus.py help` for help')
             sys.exit(-1)
     
-    print('reading database files...')
+    print(f'reading database files from {DATABASE}...')
     database = set()
     for filename in os.listdir(DATABASE):
         with open(DATABASE + filename) as file:
