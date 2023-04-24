@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     print('database size: ' + str(len(database)))
     print('processes spawned: ' + str(args['cpu_count']))
-    hash_num = multiprocessing.Value('i', 0)
+    hash_num = multiprocessing.Value('Q', 0) # Use long long unsigned int
     start_time = time.time()
     
     for cpu in range(args['cpu_count']):
